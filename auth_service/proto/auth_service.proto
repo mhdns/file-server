@@ -1,0 +1,30 @@
+syntax="proto3";
+
+package file_server_auth;
+
+option go_package="/auth_pb";
+
+import "auth_message.proto";
+
+message LoginRequest {
+    int64 login_date = 1; 
+    LoginCred login_cred = 2;
+}
+
+message LoginResponse {
+    Token token = 1;
+}
+
+message RegisterRequest {
+    int64 register_date = 1;
+    RegisterDetails register_details = 2;
+}
+
+message RegisterResponse {
+    Token token = 1;
+}
+
+service AuthService {
+    rpc Login(LoginRequest) returns (LoginResponse){};
+    rpc Register(RegisterRequest) returns (RegisterResponse){};
+}

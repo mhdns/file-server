@@ -1,0 +1,21 @@
+syntax="proto3";
+
+package file_server_auth;
+
+option go_package = "/auth_pb";
+
+message LoginCred {
+    string email = 1;
+    string password = 2;
+}
+
+message RegisterDetails {
+    string email = 1;
+    string password = 2;
+    string name = 3;
+    int64 birthdate = 4;
+}
+
+message Token {
+    string token = 1;
+}
