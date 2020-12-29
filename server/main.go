@@ -10,13 +10,15 @@ import (
 
 func main() {
 	var serverPort int
+	var templatePathPattern string
 	flag.IntVar(&serverPort, "port", 8080, "port for server to run")
+	flag.StringVar(&templatePathPattern, "pattern", "./server/templates/*.html", "path and file pattern to template files")
 	flag.Parse()
 
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tpl := template.Must(template.ParseGlob("server/templates/*.html"))
+		tpl := template.Must(template.ParseGlob(templatePathPattern))
 
 		err := tpl.ExecuteTemplate(w, "index.html", nil)
 		if err != nil {
