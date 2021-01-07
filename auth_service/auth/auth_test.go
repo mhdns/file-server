@@ -12,7 +12,13 @@ import (
 )
 
 func TestLogin(t *testing.T) {
-	server := auth.NewAuthenticationServer()
+	server := auth.NewAuthenticationServer(time.Hour, "Secret")
+
+	email := "sample@gmail.com"
+	password := "randomP"
+	name := "Joker Tan"
+
+	registerUser(email, password, name, t, server)
 
 	req := &auth_pb.LoginRequest{
 		LoginDate: time.Now().Unix(),
@@ -27,14 +33,24 @@ func TestLogin(t *testing.T) {
 }
 
 func TestRegister(t *testing.T) {
-	server := auth.NewAuthenticationServer()
+	email := "sample@gmail.com"
+	password := "randomP"
+	name := "Joker Tan"
+
+	registerUser(email, password, name, t, nil)
+}
+
+func registerUser(email, password, name string, t *testing.T, server *auth.AuthenticationServer) {
+	if server == nil {
+		server = auth.NewAuthenticationServer(time.Hour, "Secret")
+	}
 
 	req := &auth_pb.RegisterRequest{
 		RegisterDate: time.Now().Unix(),
 		RegisterDetails: &auth_pb.RegisterDetails{
-			Email:     "sample@gmail.com",
-			Password:  "randomP",
-			Name:      "Joker Tan",
+			Email:     email,
+			Password:  password,
+			Name:      name,
 			Birthdate: time.Date(1993, time.Month(6), 11, 0, 0, 0, 0, time.UTC).Unix(),
 		},
 	}
