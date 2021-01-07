@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mhdns/web_server/auth_service/auth_pb"
 )
@@ -9,6 +10,14 @@ import (
 // AuthenticationServer server
 type AuthenticationServer struct {
 	auth_pb.UnimplementedAuthServiceServer
+	store *InMemoryUserStore
+}
+
+// NewAuthenticationServer returns a pointer to an AuthenticationServer with new in memory user store
+func NewAuthenticationServer() *AuthenticationServer {
+	return &AuthenticationServer{
+		store: NewInMemoryUserStore(),
+	}
 }
 
 // Login describe
@@ -23,7 +32,7 @@ func (server *AuthenticationServer) Login(ctx context.Context, req *auth_pb.Logi
 
 	// return response
 
-	return nil, nil
+	return nil, fmt.Errorf("error")
 }
 
 // Register describe
@@ -39,5 +48,5 @@ func (server *AuthenticationServer) Register(ctx context.Context, req *auth_pb.R
 
 	// return token
 
-	return nil, nil
+	return nil, fmt.Errorf("error")
 }
