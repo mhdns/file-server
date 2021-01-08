@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	salt       = "KADskasndkalndsakdn34k2n4!231."
 	emailRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\\])"
 )
 
@@ -43,7 +44,8 @@ func (server *AuthenticationServer) Login(ctx context.Context, req *auth_pb.Logi
 	}
 
 	// Check Password is the same
-	if user.Password != password {
+	validPassword := ComparePassword(password, salt, user.Password)
+	if !validPassword {
 		return nil, status.Errorf(codes.Internal, "invalid credentials")
 	}
 	// Create JWT Token
@@ -85,8 +87,15 @@ func (server *AuthenticationServer) Register(ctx context.Context, req *auth_pb.R
 	if !validEmail {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid email format: %v", err)
 	}
+
+	// hash he password
+	hashedPassword, err := HashPassword(password, salt)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to hash password: %v", err)
+	}
+
 	// Insert user into store
-	user = NewUser(email, password, name)
+	user = NewUser(email, string(hashedPassword), name)
 	err = server.store.Save(user)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to save user: %v", err)
