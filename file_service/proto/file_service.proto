@@ -1,0 +1,34 @@
+syntax="proto3";
+
+package file_server_service;
+
+option go_package = "/file_pb";
+
+import "file_message.proto";
+
+
+message FileUploadRequest {
+    oneof data {
+        Metadata metadata = 1;
+        File chunk = 2;
+    }
+}
+
+message FileUploadResponse {
+    string filename = 1;
+    Status status = 2;
+}
+
+message FileDeleteRequest {
+    string filename = 1;
+}
+
+message FileDeleteResponse {
+    string filename = 1;
+    Status status = 2;
+}
+
+service FileService {
+    rpc FileUpload (stream FileUploadRequest) returns (FileUploadResponse);
+    rpc FileDelete (FileDeleteRequest) returns (FileDeleteResponse);
+}
