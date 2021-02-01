@@ -35,7 +35,15 @@ func TestFileUpload(t *testing.T) {
 }
 
 func TestFileDelete(t *testing.T) {
-
+	serverAddr := createFileServer(t, "/Users/anas/go/src/github.com/mhdns/web_server/tmp")
+	clientServer := createFileClient(t, serverAddr)
+	filePath := ""
+	req := &file_pb.FileDeleteRequest{
+		Filename: filePath,
+	}
+	res, err := clientServer.FileDelete(context.Background(), req)
+	require.NoError(t,err)
+	require.NotEmpty(t, res)
 }
 
 func createFileClient(t *testing.T, addrString string) file_pb.FileServiceClient {
