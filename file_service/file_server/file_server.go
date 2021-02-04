@@ -3,7 +3,6 @@ package file
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
@@ -114,7 +113,29 @@ func (server *Server) FileUpload(req file_pb.FileService_FileUploadServer) error
 func (server *Server) FileDelete(
 	ctx context.Context,
 	req *file_pb.FileDeleteRequest,) (*file_pb.FileDeleteResponse, error) {
-	return nil, fmt.Errorf("unimplemented")
+	// Check if file exists
+	filename := req.GetFilename()
+	filePath := path.Join(server.homeDirectory, "user", filename)
+	fileExist, err := exists(filePath)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to check file path: %v", err)
+	}
+	if !fileExist {
+		return nil, status.Errorf(codes.InvalidArgument, "cannot file with name: %v", filename)
+	}
+	// Check if the person is the owner of the file
+	// TODO
+	// Delete File
+	err = os.Remove(filePath)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to delete file: %v", err)
+	}
+	// Send response
+	res := &file_pb.FileDeleteResponse{
+		Filename: filename,
+		Status: file_pb.Status_SUCCESS,
+	}
+	return res, nil
 }
 
 // exists returns whether the given file or directory exists
